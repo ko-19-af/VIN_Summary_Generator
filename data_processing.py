@@ -1,0 +1,253 @@
+import pandas as pd
+import csv
+from datetime import datetime
+
+# Output: A valid JSON object with the following fields:
+
+def initial_prompt(year: int, Make: str, Model: str, Cp: int, Cpm: int,
+                   DOL: str, Mileage: int, TVDPs: int, Tso: int):
+    return ("Give me a brief summary and numerical risk evaluation on a scale of (1-10), along with a "
+            "short justification for that score, on a car with the following stats: \n"
+            "Make: " + str(Make) + "\nYear: " + str(year) + "\nCurrent Price: " + str(Cp) +
+            "\nCurrent Price to Market %: " + str(Cpm) + "\nMileage: " + str(Mileage) + "\nTotal VDPs: " +
+            str(TVDPs) + "\nTotal sales opportunities: " + str(Tso)) + "\nDOL: " + DOL + "."
+
+# risk_score: A numerical score from 1-10 (1 being low risk, 10 being high risk)
+# based on metrics like days_on_lot, price_to_market, vdp_views, etc.
+
+def rating( year: int, Cp: int, Cpm: int, Mileage: int, TVDPs: int, Tso: int, Make: str, DOL: int):
+    score = 0
+
+    # Get the current local date and time
+    current_datetime = datetime.now()
+    # Extract the year attribute
+    current_year = current_datetime.year
+
+    if int(current_year) - int(year) >= 5:
+        score += 1
+
+    if int(Cp) > 70000:
+        score += 1
+    elif int(Cp) > 19999:
+        score -= 1
+    else:
+        score += 1
+
+    if int(Cpm) > 100:
+        score += 1
+    elif int(Cpm) > 84:
+        score += 0
+    else:
+        score -= 1
+
+    american = ["BUICK", "CADILLAC", "CHEVROLET","CHRYSLER", "DODGE"
+                "FORD", "GMC", "JEEP", "RAM", "VOLKSWAGEN"]
+    european = ["ACURA", "AUDI", "BMW", "HONDA", "HYUNDAI", "KIA", "LEXUS",
+                "MAZDA", "MERCEDES", "NISSAN", "SUBARU", "TOYOTA"]
+
+    if str(Make) in american:
+        if int(Mileage) > 62000:
+            score += 3
+        else:
+            score += 1
+
+    elif str(Make) in european:
+        if int (Mileage) > 62000:
+            score += 2
+        else:
+            score +=1
+
+    if int(DOL) < 30 < int(TVDPs):
+        score += 0
+    elif int(DOL) > 30 > int(TVDPs):
+        score += 3
+
+    if int(Tso) < 5:
+        score += 3
+    elif int(Tso) < 14:
+        score += 2
+    else:
+        score += 1
+
+    if score < 0:
+        return 1
+    elif score > 10:
+        return 10
+    else:
+        return score
+
+# summary: A short, human-readable summary of the vehicle's market position.
+
+def summary(rating_score: int, year: int, Cp: int, Cpm: int, Mileage: int, TVDPs: int, Tso: int, Make: str, DOL: int):
+
+    summary_text = ""
+
+    if rating_score > 7:
+        summary_text += "summary: The car possess a poor market position"
+    elif rating_score > 4:
+        summary_text += "summary: The car possess a good market position"
+    else:
+        summary_text += "summary: The car possess an excellent market position"
+
+    # Get the current local date and time
+    current_datetime = datetime.now()
+    # Extract the year attribute
+    current_year = current_datetime.year
+
+    if int(current_year) - int(year) >= 5:
+        summary_text += ", as the car is an older model"
+    else:
+        summary_text += ", as the car is a newer model"
+
+    if int(Cp) > 70000:
+        summary_text += " with a high price"
+    elif int(Cp) > 19999:
+        summary_text += " within a reasonable price range"
+    else:
+        summary_text += " with a concerningly low price"
+
+    if int(Cpm) > 100:
+        summary_text += ", priced over its market value"
+    elif int(Cpm) > 84:
+        summary_text += ", priced close to its market value"
+    else:
+        summary_text += ", priced under its market value"
+
+    american = ["BUICK", "CADILLAC", "CHEVROLET", "CHRYSLER", "DODGE"
+                "FORD", "GMC", "JEEP", "RAM", "VOLKSWAGEN"]
+    european = ["ACURA", "AUDI", "BMW", "HONDA", "HYUNDAI", "KIA", "LEXUS",
+                "MAZDA", "MERCEDES", "NISSAN", "SUBARU", "TOYOTA"]
+
+    car_type = "unknown"
+
+    if str(Make) in american:
+        car_type = "american"
+    elif str(Make) in european:
+        car_type = "european"
+
+    if int(Mileage) > 62000:
+        summary_text += ", while being a high mileage "+ car_type + " made " + str(Make)
+    else:
+        summary_text += ", while being a low mileage "+ car_type + " made " + str(Make)
+
+    if int(DOL) < 30 < int(TVDPs):
+        summary_text += ", with high VDP while not being on the lot for to long"
+    elif int(DOL) > 30 > int(TVDPs):
+        summary_text += ", with low VDP while being on the lot for to long"
+
+    if int(Tso) > 15:
+        summary_text += ", and numerous failed sales opportunities."
+    elif int(Tso) > 4:
+        summary_text += ", and a few failed sales opportunities."
+    else:
+        summary_text +=", and nearly no sale opportunities"
+
+    return summary_text
+
+# reasoning: A clear, concise explanation for the assigned risk score,
+# generated by the LLM.
+
+def reasoning(year: int, Cp: int, Cpm: int, Mileage: int, TVDPs: int, Tso: int, Make: str, DOL: int):
+    reasoning_text = "reasoning: This risk score was assigned to this car because "
+
+    # Get the current local date and time
+    current_datetime = datetime.now()
+    # Extract the year attribute
+    current_year = current_datetime.year
+
+    if int(current_year) - int(year) >= 5:
+        reasoning_text += "as an older model it may possess outdated systems and not adhere to certain laws"
+    else:
+        reasoning_text += "as a newer model its features and systems should be to the industry standard"
+
+    if int(Cp) > 70000:
+        reasoning_text += ", additionally the cars high price would turn away the average person looking to buy a car"
+    elif int(Cp) > 19999:
+        reasoning_text += ", additionally the car is in a reasonable price range that would be able to attract are large pool of buyers"
+    else:
+        ", additionally the car has a price that may concern buyers due to defects or maintenance costs"
+
+    if int(Cpm) > 100:
+        reasoning_text += ", with the price of the car being over its market value"
+    elif int(Cpm) > 84:
+        reasoning_text += ", with the price of the car being close to its market value"
+    else:
+        reasoning_text += ", with the price of the car being under its market value"
+
+    american = ["BUICK", "CADILLAC", "CHEVROLET", "CHRYSLER", "DODGE"
+               "FORD", "GMC", "JEEP", "RAM", "VOLKSWAGEN"]
+    european = ["ACURA", "AUDI", "BMW", "HONDA", "HYUNDAI", "KIA", "LEXUS",
+                "MAZDA", "MERCEDES", "NISSAN", "SUBARU", "TOYOTA"]
+
+    if str(Make) in american:
+        if int(Mileage) > 62000:
+            reasoning_text += (", and considering the car is american made with high mileage, it may be difficult to"
+                               " find buyers due to wear and tear")
+        else:
+            reasoning_text += (", and considering the car is american made with low mileage it should not affect the"
+                               " ability to find a buyer")
+
+    elif str(Make) in european:
+        if int(Mileage) > 62000:
+            reasoning_text += (", and considering the car is european made with high mileage, finding a buyer will be"
+                               " challenging due to wear and tear but not as difficult if it were american made")
+        else:
+            reasoning_text += (", and considering the car is european made with low mileage it should not affect the"
+                               " ability to find a buyer")
+
+    if int(DOL) < 30 < int(TVDPs):
+        reasoning_text += ", also the high VDP and short DOL period indicates a high interest in the vehicle"
+    elif int(DOL) > 30 > int(TVDPs):
+        reasoning_text += ", also the low VDP and long DOL period indicates there is not much interest in the vehicle"
+
+    if int(Tso) > 15:
+        reasoning_text += (", and the amount of failed sales opportunities missed, shows it gets a good amount of "
+                         "attention but is difficult to sell at current value.")
+    elif int(Tso) > 4:
+        reasoning_text += ", and the amount of failed sales opportunities missed, shows it gets a good amount of attention."
+    else:
+        reasoning_text += ", and the amount of failed sales opportunities missed, shows it does not get much interest."
+
+    return reasoning_text
+
+def main():
+    df = pd.read_csv('sample_data.csv') # read in the csv with the data
+
+    print(df.max())
+    print(df.min())
+
+    for x in df.index:
+        if df.loc[x, 'Current price to market %'] == '-':
+            df.drop(x, inplace=True)
+        elif df.loc[x, 'DOL'] == '-':
+            df.drop(x, inplace=True)
+
+    data =[['risk_rating', 'prompt', 'response']]
+
+    for index, row in df.iterrows():
+        prompt = initial_prompt(row['Year'], row['Make'], row['Model'], row['Current price'],
+                            row['Current price to market %'], row['DOL'], row['Mileage'],
+                            row['Total VDPs (lifetime)'], row['Total sales opportunities (lifetime)'])
+        risk_score = rating(row['Year'], row['Current price'].replace('$', '').replace(',', '').strip(),
+                            row['Current price to market %'].replace('%', ''), row['Mileage'].replace(',', ''),
+                            row['Total VDPs (lifetime)'].replace(',', ''), row['Total sales opportunities (lifetime)'],
+                            row['Make'], row['DOL'])
+        eo = (summary(risk_score,row['Year'], row['Current price'].replace('$', '').replace(',', '').strip(),
+                      row['Current price to market %'].replace('%', ''), row['Mileage'].replace(',', ''),
+                      row['Total VDPs (lifetime)'].replace(',', ''),row['Total sales opportunities (lifetime)'],
+                      row['Make'], row['DOL'])
+              + '\n' + "risk_score: " + str(risk_score)
+              + '\n' + reasoning(row['Year'], row['Current price'].replace('$', '').replace(',', '').strip(),
+                                 row['Current price to market %'].replace('%', ''), row['Mileage'].replace(',', ''),
+                                 row['Total VDPs (lifetime)'].replace(',', ''),
+                                 row['Total sales opportunities (lifetime)'], row['Make'], row['DOL']))
+        data.append([risk_score, prompt, eo])
+        #print(f"Index: {index}, Col1: {row['VIN']}, Col2: {row['Year']}" )
+
+    with open('model_data.csv', 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerows(data)
+
+
+if __name__ == "__main__":
+    main()
