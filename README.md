@@ -18,4 +18,10 @@ When creating the resulting summary, risk rating, numerous scenarious were gener
 The file "sample_data.csv" contains the information on the 500 cars used to fine-tune the model, and "model_data.csv" contains the processed prompt and expected outputs for model training.
 
 ## Backend-Framework
-A backend-framework is added to the LLM model, providing the model RESTful API endpoints to communicate with the code.
+A backend-framework is added to the LLM model using Flask, providing the model RESTful endpoints to receive and send data to a corresponding frontend-framework.
+
+## How to run
++ To run this model first run the "data_processing.py" file to produce the prompts and their associated resulting text.
++ Once this step is completed run the "car_review_LLM_Model.py" to train the model on the data produced from the first step.
++ Final run the trained model using "car_review_LL_model_trained.py" this will then generate a local server to a webpage that will produce a review of a default vin number.
++ To test other vin numbers type"/vin/##########" into the url to have the model produce a review for a different vin  number, replacing the # with the vin you wish to review.
