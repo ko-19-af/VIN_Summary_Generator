@@ -16,3 +16,6 @@ A python script was developed to help mass produce the prompts and expected outp
 When processing the data several entrys were removed to incomplete data, when engineering the prompts a single style was employed so as to have the model focus more on the that is included in the text.
 When creating the resulting summary, risk rating, numerous scenarious were generated based on the various data points, while not all encompassing it provides a suitable amount of options for the model to learn from.
 The file "sample_data.csv" contains the information on the 500 cars used to fine-tune the model, and "model_data.csv" contains the processed prompt and expected outputs for model training.
+
+## Backend-Framework
+A backend-framework is added to the LLM model, providing the model RESTful API endpoints to communicate with the code.
