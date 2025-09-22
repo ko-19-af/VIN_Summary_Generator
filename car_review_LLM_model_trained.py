@@ -2,9 +2,9 @@ import pandas as pd
 import json
 from transformers import T5Tokenizer, T5ForConditionalGeneration
 
-# from flask import Flask
+from flask import Flask
 
-# app = Flask(__name__)
+app = Flask(__name__)
 
 model_name = 't5-base'
 tokenizer = T5Tokenizer.from_pretrained(model_name)
@@ -37,12 +37,11 @@ def find_vin(vin):
 
     return Make, Year, Cp, Cpm, Mileage, TVDPs, TSO, DOL
 
-# @app.route('/user/<vin>')
-# def review_car(vin):
-def main():
-    # vin = {vin}
-    vin = input("Enter VIN: ")
-    Make, Year, Cp, Cpm, Mileage, TVDPs, TSO, DOL = find_vin(vin)
+
+@app.route('/', defaults={'vin': "3CZRZ2H50TM705238"})
+@app.route('/vin/<string:vin>')
+def main(vin):
+    Make, Year, Cp, Cpm, Mileage, TVDPs, TSO, DOL = find_vin({vin})
 
     result = str(generate_review("Give me a brief summary and numerical risk evaluation on a scale of (1-10), along with a short justification for that score, on a car with the following stats: "
                           "Make: " + Make +
@@ -66,5 +65,4 @@ def main():
     return dict_json
 
 if __name__ == "__main__":
-    # app.run(debug=True)
-    main()
+    app.run(debug=True)
