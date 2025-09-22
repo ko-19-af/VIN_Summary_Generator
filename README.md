@@ -1,6 +1,6 @@
 # LLM for vehicle review generation.
 
-A LLM model trained to produce a summary, risk score, and justification for that score based on a vehicles VIN number. A limited sample of of vehicles and their associated data
+A LLM model trained to produce a summary, risk score, and justification for that score based on a vehicles VIN number. A limited sample of vehicles and their associated data
 are used to train the model. This vehicle data includes: a VIN, Make, Model, Year, Price, Price_to_market, Days_on_lot, Mileage, vdp_views, and Sales_opportunities.
 Here is one of the data points used to train the model: [3CZRZ2H50TM705238,2026,HONDA,HR-V,"$30,895 ",100%,110,0,109,0]
 
